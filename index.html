@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini活用 インタラクティブガイド</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals (Background: #FDFBF8, Text: #4A4A4A, Primary Accent: #D97706, Secondary Accent: #047857) -->
+    <!-- Application Structure Plan: A single-page, top-down narrative structure with a sticky navigation bar for quick access. The flow guides the user from the "what" (What is Gemini?), to the "why" (Benefits), to the "how" (Use Cases), to a direct "experience" (Try Gemini), and finally to "get started" (Tips & How to Start). This structure is more engaging than a static document, using interactivity (clickable cards, charts, tabs, LLM demos) to encourage exploration and improve information retention. It breaks down complex information into digestible, task-oriented sections, making it highly usable for a general corporate audience. -->
+    <!-- Visualization & Content Choices: 
+        - Hero: Goal=Engage. Method=Large typography and a "Start" button for a clear entry point.
+        - What is Gemini?: Goal=Inform. Method=Interactive cards with Unicode icons. Interaction=Click to reveal description. Justification=More dynamic and memorable than a bullet list.
+        - Benefits: Goal=Compare/Inform. Method=Radar Chart. Interaction=Tooltips on hover. Justification=Visually communicates multi-faceted improvements at a glance. Library=Chart.js.
+        - Use Cases: Goal=Organize/Explore. Method=Tabbed interface. Interaction=Click tabs to filter use cases. Justification=Allows users to easily find scenarios relevant to their own work, making the information more practical and actionable.
+        - Try Gemini: Goal=Experience/Demonstrate. Method=Textarea with buttons for LLM-powered summarization and continuation. Interaction=User input text, click buttons to trigger Gemini API calls, display AI output. Justification=Provides a direct, hands-on demonstration of Gemini's core text capabilities, reinforcing the guide's content.
+        - Get Started: Goal=Educate. Method=Side-by-side comparison for prompt examples. Justification=Clearly illustrates the difference between effective and ineffective instructions for the AI.
+        - All content is presented within these interactive structures to create a cohesive, guided experience.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background-color: #FDFBF8;
+            color: #4A4A4A;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            height: 300px;
+            margin: auto;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .tab-active {
+            background-color: #D97706;
+            color: #FFFFFF;
+        }
+        .tab-inactive {
+            background-color: #F3F4F6;
+            color: #4A4A4A;
+        }
+        .card-flip {
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .card-flip.is-flipped {
+            transform: rotateY(180deg);
+        }
+        .card-face {
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        .card-back {
+            transform: rotateY(180deg);
+        }
+        .loading-spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #D97706;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-amber-600">Gemini Guide</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#what-is-gemini" class="hover:text-amber-600 transition-colors">Geminiとは？</a>
+                <a href="#benefits" class="hover:text-amber-600 transition-colors">メリット</a>
+                <a href="#use-cases" class="hover:text-amber-600 transition-colors">活用例</a>
+                <a href="#try-gemini" class="hover:text-amber-600 transition-colors">Geminiを体験</a>
+                <a href="#get-started" class="hover:text-amber-600 transition-colors">始め方</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="text-center py-20 md:py-32 bg-amber-50">
+            <div class="container mx-auto px-6">
+                <h2 class="text-4xl md:text-6xl font-bold text-amber-900 mb-4">Geminiで、<br class="md:hidden">業務を加速させよう</h2>
+                <p class="text-lg md:text-xl text-amber-800 max-w-2xl mx-auto mb-8">AIアシスタントGeminiの可能性を探り、あなたの働き方を革新するためのインタラクティブガイドへようこそ。</p>
+                <a href="#what-is-gemini" class="bg-amber-600 text-white font-bold py-3 px-8 rounded-full hover:bg-amber-700 transition-transform transform hover:scale-105">さっそく探る</a>
+            </div>
+        </section>
+
+        <section id="what-is-gemini" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Geminiとは？</h2>
+                    <p class="text-lg max-w-3xl mx-auto">Geminiは、テキスト、画像、音声など多様な情報を理解し、対話形式であなたの業務を支援する最先端のAIアシスタントです。以下のカードをクリックして、Geminiの主な能力を発見してください。</p>
+                </div>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <div class="capability-card cursor-pointer group" data-title="情報収集と要約" data-description="膨大な情報から必要な部分を抽出し、簡潔にまとめることで、リサーチ時間を大幅に削減します。">
+                        <div class="relative w-full h-48 card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">📰</span>
+                                <h3 class="text-xl font-bold text-center">情報収集と要約</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capability-card cursor-pointer group" data-title="アイデア出し" data-description="新規プロジェクトのアイデアや企画の骨子などを瞬時に生成し、創造的なプロセスを加速させます。">
+                        <div class="relative w-full h-48 card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">💡</span>
+                                <h3 class="text-xl font-bold text-center">アイデア出し</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capability-card cursor-pointer group" data-title="文章作成と校正" data-description="メール、報告書、プレゼン資料の下書き作成から表現の改善まで、質の高い文章作りをサポートします。">
+                        <div class="relative w-full h-48 card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">✍️</span>
+                                <h3 class="text-xl font-bold text-center">文章作成と校正</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capability-card cursor-pointer group" data-title="翻訳" data-description="多言語間のスムーズなコミュニケーションをサポートし、グローバルな業務展開を容易にします。">
+                        <div class="relative w-full h-48 card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">🌐</span>
+                                <h3 class="text-xl font-bold text-center">翻訳</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capability-card cursor-pointer group" data-title="データ分析の補助" data-description="複雑なデータからインサイトを導き出すための補助を行い、データに基づいた意思決定を支援します。">
+                        <div class="relative w-full h-48 card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">📊</span>
+                                <h3 class="text-xl font-bold text-center">データ分析の補助</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="capability-card cursor-pointer group" data-title="プログラミング支援" data-description="コードの生成、デバッグ、アルゴリズムの解説など、開発作業の効率を劇的に向上させます。">
+                        <div class="relative w-full h-full card-flip">
+                            <div class="absolute w-full h-full card-face bg-white rounded-lg shadow-md flex flex-col justify-center items-center p-6 border-2 border-transparent group-hover:border-amber-500 transition-all">
+                                <span class="text-4xl mb-4">💻</span>
+                                <h3 class="text-xl font-bold text-center">プログラミング支援</h3>
+                            </div>
+                             <div class="absolute w-full h-full card-face card-back bg-amber-600 text-white rounded-lg shadow-md flex items-center p-6">
+                                <p class="text-center"></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="benefits" class="py-16 md:py-24 bg-emerald-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Geminiがもたらす5つのメリット</h2>
+                    <p class="text-lg max-w-3xl mx-auto">Geminiを導入することで、個人のスキルから組織全体の生産性まで、多岐にわたる領域で向上が期待できます。チャートの各項目にカーソルを合わせると、詳細が表示されます。</p>
+                </div>
+                <div class="flex flex-col lg:flex-row items-center gap-8">
+                    <div class="w-full lg:w-1/2">
+                        <div class="chart-container">
+                            <canvas id="benefitsChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-1/2 space-y-4">
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="font-bold text-emerald-700">業務効率の向上</h3>
+                            <p>定型業務や情報収集にかかる時間を短縮し、より重要な業務に集中できます。</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="font-bold text-emerald-700">創造性の刺激</h3>
+                            <p>新しいアイデアや視点を提供し、企画力や問題解決能力を高めます。</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="font-bold text-emerald-700">生産性の向上</h3>
+                            <p>作業のスピードと質を向上させ、アウトプットの量を増やします。</p>
+                        </div>
+                         <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="font-bold text-emerald-700">スキルの拡張</h3>
+                            <p>専門外の分野でも、Geminiのサポートを得て新しい知識やスキルを習得できます。</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg shadow">
+                            <h3 class="font-bold text-emerald-700">円滑な連携</h3>
+                            <p>翻訳機能などを活用し、言語の壁を越えたグローバルな連携を強化します。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="use-cases" class="py-16 md:py-24">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">あなたの業務に合わせた活用例</h2>
+                    <p class="text-lg max-w-3xl mx-auto">Geminiは様々な業務シーンで活躍します。下のタブをクリックして、あなたの仕事に関連する活用例を見つけてみましょう。</p>
+                </div>
+                <div class="flex justify-center flex-wrap gap-2 mb-8">
+                    <button class="use-case-tab tab-active px-4 py-2 rounded-full font-semibold transition-all" data-target="tab-all">すべて</button>
+                    <button class="use-case-tab tab-inactive px-4 py-2 rounded-full font-semibold transition-all" data-target="tab-planning">資料作成・企画</button>
+                    <button class="use-case-tab tab-inactive px-4 py-2 rounded-full font-semibold transition-all" data-target="tab-communication">コミュニケーション</button>
+                    <button class="use-case-tab tab-inactive px-4 py-2 rounded-full font-semibold transition-all" data-target="tab-ideation">アイデア創出</button>
+                    <button class="use-case-tab tab-inactive px-4 py-2 rounded-full font-semibold transition-all" data-target="tab-learning">学習・自己啓発</button>
+                </div>
+                <div id="use-cases-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-500" data-category="tab-planning">
+                        <h3 class="font-bold text-lg mb-2">企画書の骨子作成</h3>
+                        <p>新規事業の目的、ターゲット、戦略などの要素をGeminiに提案させ、企画の土台を素早く構築。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-500" data-category="tab-planning">
+                        <h3 class="font-bold text-lg mb-2">プレゼン構成案の作成</h3>
+                        <p>テーマと聴衆を伝えるだけで、説得力のあるスライド構成とストーリーラインを相談できる。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-amber-500" data-category="tab-planning">
+                        <h3 class="font-bold text-lg mb-2">会議議事録の要約</h3>
+                        <p>長い議事録から主要な決定事項とToDoを瞬時に抽出し、情報共有を効率化。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500" data-category="tab-communication">
+                        <h3 class="font-bold text-lg mb-2">メール作成の補助</h3>
+                        <p>顧客への感謝メールから社内報告まで、目的に応じた丁寧で適切な下書きを生成。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500" data-category="tab-communication">
+                        <h3 class="font-bold text-lg mb-2">社内アナウンス文の作成</h3>
+                        <p>イベント告知や重要連絡を、適切なトーンと分かりやすい言葉で作成。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500" data-category="tab-communication">
+                        <h3 class="font-bold text-lg mb-2">海外パートナーとの翻訳</h3>
+                        <p>外国語のメール文面を、文脈を考慮した自然な日本語に、またはその逆に瞬時に翻訳。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500" data-category="tab-ideation">
+                        <h3 class="font-bold text-lg mb-2">ブレインストーミング</h3>
+                        <p>新製品のネーミングやキャッチコピーなど、一人では思いつかない多様なアイデアをGeminiと出し合う。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-blue-500" data-category="tab-ideation">
+                        <h3 class="font-bold text-lg mb-2">課題解決策の検討</h3>
+                        <p>業務上の課題について、多角的な視点から複数の解決策の選択肢を提案させる。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500" data-category="tab-learning">
+                        <h3 class="font-bold text-lg mb-2">専門知識の習得</h3>
+                        <p>新しい技術や業界トレンドについて、初心者にも分かるように平易な言葉で解説してもらう。</p>
+                    </div>
+                    <div class="use-case-item bg-white p-6 rounded-lg shadow-md border-l-4 border-purple-500" data-category="tab-learning">
+                        <h3 class="font-bold text-lg mb-2">スキルアップの情報収集</h3>
+                        <p>特定のスキルを向上させるための学習リソースや具体的な勉強方法を尋ねる。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- New Section: Try Gemini -->
+        <section id="try-gemini" class="py-16 md:py-24 bg-orange-50">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Geminiを体験しよう</h2>
+                    <p class="text-lg max-w-3xl mx-auto">実際にGeminiのテキスト生成能力を試してみましょう。下のテキストエリアに文章を入力し、ボタンをクリックしてください。</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
+                    <textarea id="gemini-input" class="w-full p-4 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="8" placeholder="ここにテキストを入力してください。例：GeminiはGoogleが開発した大規模言語モデルです。文章の要約、生成、翻訳など、様々なタスクを実行できます。"></textarea>
+                    <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                        <button id="summarize-btn" class="flex-1 bg-amber-600 text-white font-bold py-3 px-6 rounded-full hover:bg-amber-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="summarize-loading" class="hidden loading-spinner mr-2"></span>
+                            ✨ 要約する
+                        </button>
+                        <button id="continue-btn" class="flex-1 bg-emerald-600 text-white font-bold py-3 px-6 rounded-full hover:bg-emerald-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
+                            <span id="continue-loading" class="hidden loading-spinner mr-2"></span>
+                            ✨ 続きを生成する
+                        </button>
+                    </div>
+                    <div id="gemini-output-container" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
+                        <h3 class="text-lg font-semibold mb-2">Geminiからの応答：</h3>
+                        <p id="gemini-output" class="whitespace-pre-wrap text-gray-700"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="get-started" class="py-16 md:py-24 bg-stone-100">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4">今日から始めるためのヒント</h2>
+                    <p class="text-lg max-w-3xl mx-auto">Geminiの能力を最大限に引き出す鍵は「プロンプト（指示）」にあります。良い指示のコツを学びましょう。</p>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-center mb-6">良いプロンプト vs. 惜しいプロンプト</h3>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 text-red-600">❌ 惜しい例</h4>
+                            <div class="bg-red-50 p-4 rounded-lg border border-red-200">
+                                <p class="font-mono text-gray-700">「新製品について教えて。」</p>
+                                <p class="text-sm mt-2 text-red-800">→ 漠然としすぎており、Geminiは何を答えれば良いか分かりません。</p>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="text-xl font-semibold mb-2 text-green-600">✅ 良い例</h4>
+                            <div class="bg-green-50 p-4 rounded-lg border border-green-200">
+                                 <p class="font-mono text-gray-700">「新製品のターゲット顧客層について、30代女性、都内在住、IT企業勤務という条件でペルソナを3つ作成してください。」</p>
+                                <p class="text-sm mt-2 text-green-800">→ 役割、文脈、期待するアウトプットが明確で、質の高い回答が期待できます。</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-10 pt-6 border-t">
+                        <h3 class="text-2xl font-bold text-center mb-6">成功のための5つのポイント</h3>
+                         <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 text-center">
+                            <div class="p-4"><strong class="block text-amber-700 text-lg">1. 明確な指示</strong><span class="text-sm">具体的に何をしてほしいか明確に伝える</span></div>
+                            <div class="p-4"><strong class="block text-amber-700 text-lg">2. 文脈の提供</strong><span class="text-sm">質問の背景や目的を共有する</span></div>
+                            <div class="p-4"><strong class="block text-amber-700 text-lg">3. 反復と絞り込み</strong><span class="text-sm">対話を重ねて精度を上げる</span></div>
+                            <div class="p-4"><strong class="block text-amber-700 text-lg">4. 倫理的な利用</strong><span class="text-sm">機密情報を避け、事実確認を怠らない</span></div>
+                             <div class="p-4 col-span-1 sm:col-span-2 lg:col-span-1"><strong class="block text-amber-700 text-lg">5. 試行錯誤を楽しむ</strong><span class="text-sm">色々な使い方を試して可能性を探る</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white">
+        <div class="container mx-auto px-6 py-12">
+            <div class="text-center">
+                <h2 class="text-2xl font-bold mb-4">さあ、あなたの業務に<br class="sm:hidden">Geminiを取り入れよう</h2>
+                 <p class="mb-8 max-w-2xl mx-auto">不明な点があれば、いつでもサポートチームにご連絡ください。</p>
+                <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <strong>社内ヘルプデスク:</strong> [ヘルプデスクの連絡先]
+                    </div>
+                    <div class="bg-gray-700 p-4 rounded-lg">
+                        <strong>FAQページ:</strong> <a href="#" class="text-amber-400 hover:underline">[社内ポータルサイトのURL]</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="bg-gray-900 py-4">
+            <p class="text-center text-sm text-gray-400">&copy; 2024 Your Company Name. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const benefitsCtx = document.getElementById('benefitsChart');
+    if (benefitsCtx) {
+        new Chart(benefitsCtx, {
+            type: 'radar',
+            data: {
+                labels: ['業務効率', '創造性', '生産性', 'スキル拡張', '円滑な連携'],
+                datasets: [{
+                    label: 'Geminiがもたらす向上',
+                    data: [90, 85, 95, 80, 88],
+                    fill: true,
+                    backgroundColor: 'rgba(4, 120, 87, 0.2)',
+                    borderColor: 'rgb(4, 120, 87)',
+                    pointBackgroundColor: 'rgb(4, 120, 87)',
+                    pointBorderColor: '#fff',
+                    pointHoverBackgroundColor: '#fff',
+                    pointHoverBorderColor: 'rgb(4, 120, 87)'
+                }]
+            },
+            options: {
+                maintainAspectRatio: false,
+                scales: {
+                    r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                        pointLabels: { font: { size: 14 } },
+                        ticks: {
+                            backdropColor: 'transparent',
+                            stepSize: 20,
+                            max: 100,
+                            min: 0
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed.r !== null) {
+                                    label += context.parsed.r + '点';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    const useCaseTabs = document.querySelectorAll('.use-case-tab');
+    const useCaseItems = document.querySelectorAll('.use-case-item');
+    useCaseTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            const target = tab.dataset.target;
+
+            useCaseTabs.forEach(t => {
+                t.classList.remove('tab-active');
+                t.classList.add('tab-inactive');
+            });
+            tab.classList.add('tab-active');
+            tab.classList.remove('tab-inactive');
+
+            useCaseItems.forEach(item => {
+                if (target === 'tab-all' || item.dataset.category === target) {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    });
+
+    const capabilityCards = document.querySelectorAll('.capability-card');
+    capabilityCards.forEach(card => {
+        const description = card.dataset.description;
+        const cardFlip = card.querySelector('.card-flip');
+        const backFaceP = card.querySelector('.card-back p');
+        backFaceP.textContent = description;
+
+        card.addEventListener('click', () => {
+            cardFlip.classList.toggle('is-flipped');
+        });
+    });
+
+    // Gemini API Integration Logic
+    const geminiInput = document.getElementById('gemini-input');
+    const summarizeBtn = document.getElementById('summarize-btn');
+    const continueBtn = document.getElementById('continue-btn');
+    const geminiOutputContainer = document.getElementById('gemini-output-container');
+    const geminiOutput = document.getElementById('gemini-output');
+    const summarizeLoading = document.getElementById('summarize-loading');
+    const continueLoading = document.getElementById('continue-loading');
+
+    const callGeminiApi = async (prompt, loadingElement, buttonElement) => {
+        loadingElement.classList.remove('hidden');
+        buttonElement.disabled = true;
+        geminiOutputContainer.classList.add('hidden');
+        geminiOutput.textContent = '';
+
+        try {
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Canvas will provide this at runtime if empty
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`API error: ${response.status} - ${errorData.error.message || 'Unknown error'}`);
+            }
+
+            const result = await response.json();
+
+            if (result.candidates && result.candidates.length > 0 &&
+                result.candidates[0].content && result.candidates[0].content.parts &&
+                result.candidates[0].content.parts.length > 0) {
+                return result.candidates[0].content.parts[0].text;
+            } else {
+                console.warn("Gemini API response structure unexpected:", result);
+                return "コンテンツを生成できませんでした。もう一度お試しください。";
+            }
+        } catch (error) {
+            console.error("Error calling Gemini API:", error);
+            return `エラー: ${error.message}。十分なコンテンツを入力しているか確認してください。`;
+        } finally {
+            loadingElement.classList.add('hidden');
+            buttonElement.disabled = false;
+        }
+    };
+
+    summarizeBtn.addEventListener('click', async () => {
+        const inputText = geminiInput.value.trim();
+        if (!inputText) {
+            geminiOutputContainer.classList.remove('hidden');
+            geminiOutput.textContent = "要約するテキストを入力してください。";
+            return;
+        }
+        const prompt = `以下のテキストを簡潔に要約してください。\n\n${inputText}`;
+        const summary = await callGeminiApi(prompt, summarizeLoading, summarizeBtn);
+        geminiOutput.textContent = summary;
+        geminiOutputContainer.classList.remove('hidden');
+    });
+
+    continueBtn.addEventListener('click', async () => {
+        const inputText = geminiInput.value.trim();
+        if (!inputText) {
+            geminiOutputContainer.classList.remove('hidden');
+            geminiOutput.textContent = "続きを生成するテキストを入力してください。";
+            return;
+        }
+        const prompt = `以下のテキストの続きを、自然な流れで生成してください。\n\n${inputText}`;
+        const continuation = await callGeminiApi(prompt, continueLoading, continueBtn);
+        geminiOutput.textContent = continuation;
+        geminiOutputContainer.classList.remove('hidden');
+    });
+});
+</script>
+
+</body>
+</html>
