@@ -272,31 +272,6 @@
         </section>
 
         <!-- New Section: Try Gemini -->
-        <section id="try-gemini" class="py-16 md:py-24 bg-orange-50">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold mb-4">Geminiを体験しよう</h2>
-                    <p class="text-lg max-w-3xl mx-auto">実際にGeminiのテキスト生成能力を試してみましょう。下のテキストエリアに文章を入力し、ボタンをクリックしてください。</p>
-                </div>
-                <div class="bg-white p-8 rounded-lg shadow-lg max-w-3xl mx-auto">
-                    <textarea id="gemini-input" class="w-full p-4 border border-gray-300 rounded-lg mb-4 focus:outline-none focus:ring-2 focus:ring-amber-500" rows="8" placeholder="ここにテキストを入力してください。例：GeminiはGoogleが開発した大規模言語モデルです。文章の要約、生成、翻訳など、様々なタスクを実行できます。"></textarea>
-                    <div class="flex flex-col sm:flex-row gap-4 mb-6">
-                        <button id="summarize-btn" class="flex-1 bg-amber-600 text-white font-bold py-3 px-6 rounded-full hover:bg-amber-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span id="summarize-loading" class="hidden loading-spinner mr-2"></span>
-                            ✨ 要約する
-                        </button>
-                        <button id="continue-btn" class="flex-1 bg-emerald-600 text-white font-bold py-3 px-6 rounded-full hover:bg-emerald-700 transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed">
-                            <span id="continue-loading" class="hidden loading-spinner mr-2"></span>
-                            ✨ 続きを生成する
-                        </button>
-                    </div>
-                    <div id="gemini-output-container" class="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200 hidden">
-                        <h3 class="text-lg font-semibold mb-2">Geminiからの応答：</h3>
-                        <p id="gemini-output" class="whitespace-pre-wrap text-gray-700"></p>
-                    </div>
-                </div>
-            </div>
-        </section>
 
         <section id="get-started" class="py-16 md:py-24 bg-stone-100">
             <div class="container mx-auto px-6">
@@ -502,34 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
             buttonElement.disabled = false;
         }
     };
-
-    summarizeBtn.addEventListener('click', async () => {
-        const inputText = geminiInput.value.trim();
-        if (!inputText) {
-            geminiOutputContainer.classList.remove('hidden');
-            geminiOutput.textContent = "要約するテキストを入力してください。";
-            return;
-        }
-        const prompt = `以下のテキストを簡潔に要約してください。\n\n${inputText}`;
-        const summary = await callGeminiApi(prompt, summarizeLoading, summarizeBtn);
-        geminiOutput.textContent = summary;
-        geminiOutputContainer.classList.remove('hidden');
-    });
-
-    continueBtn.addEventListener('click', async () => {
-        const inputText = geminiInput.value.trim();
-        if (!inputText) {
-            geminiOutputContainer.classList.remove('hidden');
-            geminiOutput.textContent = "続きを生成するテキストを入力してください。";
-            return;
-        }
-        const prompt = `以下のテキストの続きを、自然な流れで生成してください。\n\n${inputText}`;
-        const continuation = await callGeminiApi(prompt, continueLoading, continueBtn);
-        geminiOutput.textContent = continuation;
-        geminiOutputContainer.classList.remove('hidden');
-    });
-});
-</script>
 
 </body>
 </html>
